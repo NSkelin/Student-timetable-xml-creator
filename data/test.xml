@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<block>
+	<name>ACIT</name>
+	<term>
+		<number>1</number>
+		<set>
+			<set_block>a</set_block>
+			<course>
+				<course_name>acit1420</course_name>
+				<time>
+					<start>830</start>
+					<end>1120</end>
+					<day>Fri</day>
+				</time>
+			</course>
+		</set>
+	</term>
+</block>
