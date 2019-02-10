@@ -1,19 +1,4 @@
-"Status
-","Block
-","CRN
- ","Course
-","Type
-","Day
-","Begin
-Time","End
-Time"," * Instructor 
-","* Bldg/Room
-","Start Date
-","End Date
- ","Max.
-","Act.
-","Hrs
-"
+"Statu","Block","CRN","Course","Type","Day","BeginTime","EndTime"," * Instructor","* Bldg/Room","Start Date","End Date","Max.","Act.","Hrs"
 Active, ACIT 1 A,44279,ACIT1420,A,Fri,830,1120," Zhang, Lei",DTC 578,05 Sep 2018,07 Dec 2018,25,25,2.83
 Active, ACIT 1 A,34319,ACIT1515,A,Mon,1330,1620," Lane, Thomas F",DTC 581,05 Sep 2018,07 Dec 2018,25,25,2.83
 Active, ACIT 1 A,34322,ACIT1620,A,Wed,830,1120," Hart, Richard",DTC 552,05 Sep 2018,07 Dec 2018,25,25,2.83
@@ -5703,6 +5688,9 @@ Active, NMED 3 A,30604,NMED3080,P,Fri,830,1320," Badshah, Izaaz", ,22 Oct 2018,0
 Active, NMED 3 A,30604,NMED3080,P,Fri,830,1320," Badshah, Izaaz", ,19 Nov 2018,07 Dec 2018,8,8,4.83
 Active, NMED 3 A,30604,NMED3080,P,Fri,830,1320," Hudkins, Kevin", ,19 Nov 2018,07 Dec 2018,8,8,4.83
 Active, NMED 3 A,30605,PHYS3274,L,Mon,830,1020," Pointon, Barry W",SE12 309,04 Sep 2018,21 Sep 2018,8,8,1.83
+Active, NMED 3 B,30606,BHSC3306,L,Wed,930,1120,"* Nyaeme, Bassam Adam",* SE12 302,04 Sep 2018,07 Sep 2018,8,8,1.83
+Active, NMED 3 B,30606,BHSC3306,L,Wed,930,1120," Nyaeme, Bassam Adam",SE12 302,24 Sep 2018,05 Oct 2018,8,8,1.83
+Active, NMED 3 B,30606,BHSC3306,L,Wed,930,1120," Nyaeme, Bassam Adam",SE12 302,22 Oct 2018,02 Nov 2018,8,8,1.83
 Active, NMED 3 A,30605,PHYS3274,L,Mon,830,1020," Pointon, Barry W",SE12 309,08 Oct 2018,19 Oct 2018,8,8,1.83
 Active, NMED 3 A,30605,PHYS3274,L,Mon,830,1020," Pointon, Barry W",SE12 309,05 Nov 2018,16 Nov 2018,8,8,1.83
 Active, NMED 3 A,30605,PHYS3274,L,Tue,830,1020," Pointon, Barry W",SE12 312,05 Sep 2018,21 Sep 2018,8,8,1.83
@@ -5714,9 +5702,6 @@ Active, NMED 3 A,30605,PHYS3274,L,Thu,1030,1220," Pointon, Barry W",SW01 3195,05
 Active, NMED 3 B,30606,BHSC3306,L,Mon,1430,1520," Nyaeme, Bassam Adam",SW03 2765,24 Sep 2018,05 Oct 2018,8,8,0.83
 Active, NMED 3 B,30606,BHSC3306,L,Mon,1430,1520," Nyaeme, Bassam Adam",SW03 2765,22 Oct 2018,02 Nov 2018,8,8,0.83
 Active, NMED 3 B,30606,BHSC3306,L,Mon,1430,1520," Nyaeme, Bassam Adam",SW03 2765,19 Nov 2018,07 Dec 2018,8,8,0.83
-Active, NMED 3 B,30606,BHSC3306,L,Wed,930,1120,"* Nyaeme, Bassam Adam",* SE12 302,04 Sep 2018,07 Sep 2018,8,8,1.83
-Active, NMED 3 B,30606,BHSC3306,L,Wed,930,1120," Nyaeme, Bassam Adam",SE12 302,24 Sep 2018,05 Oct 2018,8,8,1.83
-Active, NMED 3 B,30606,BHSC3306,L,Wed,930,1120," Nyaeme, Bassam Adam",SE12 302,22 Oct 2018,02 Nov 2018,8,8,1.83
 Active, NMED 3 B,30606,BHSC3306,L,Wed,930,1120," Nyaeme, Bassam Adam",SE12 302,19 Nov 2018,07 Dec 2018,8,8,1.83
 Active, NMED 3 B,30606,BHSC3306,L,Fri,1130,1320," Nyaeme, Bassam Adam",SW01 3195,24 Sep 2018,05 Oct 2018,8,8,1.83
 Active, NMED 3 B,30606,BHSC3306,L,Fri,1130,1320," Nyaeme, Bassam Adam",SW01 3195,22 Oct 2018,02 Nov 2018,8,8,1.83
