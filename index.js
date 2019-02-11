@@ -6,6 +6,7 @@ var opn = require('opn');
 
 const data = fs.readFileSync('./data/test.xml');
 const csvdata = fs.readFileSync('./data/201830-Subject_Course Timetables - ttbl0010.csv');
+var blockInput = ""
 
 // asks user for input and returns it.
 function getInput() {
@@ -17,17 +18,10 @@ function getInput() {
 		readline.question(`Enter the block you want to know\n`, (block) => {
 	  		console.log(`You entered ${block}!`)
 	  		readline.close()
+            blockInput = block
 	  		resolve(block)
 		});
 	})
-}
-
-function verifyInput(input) {
-	if (input === 'hello') {
-		return false
-	} else {
-		return true
-	}
 }
 
 // reads a hardcoded file and saves the data that matches input
@@ -60,6 +54,7 @@ async function createXML(dataArr) {
     var xmlFile = fs.readFileSync('./data/test.xml')
     var parser = new xmldom.DOMParser();
     var xmldoc = parser.parseFromString(xmlFile.toString(), 'text/xml');
+    xmldoc.getElementsByTagName('Schedule')[0].setAttribute('BLOCK', blockInput);
     var root = xmldoc.documentElement;
     for(var z = 0; z < root.childNodes.length; z++){
         root.removeChild(root.childNodes[z].nodeName)
@@ -114,11 +109,11 @@ async function createXML(dataArr) {
         root.appendChild(spacer);
 
 	}
-    fs.writeFileSync('./data/test.xml',root);
+    fs.writeFileSync('./data/201830-'+ blockInput +'.xml',root);
 }
 
 function formatData(){
-    var data = fs.readFileSync('./data/test.xml')
+    var data = fs.readFileSync('./data/201830-'+ blockInput +'.xml')
     var parser = new xmldom.DOMParser();
     var xmldoc = parser.parseFromString(data.toString(), 'text/xml');
     var root = xmldoc.documentElement;
@@ -151,26 +146,10 @@ function formatData(){
 
         }
     }
-    return classesType
-
+    fs.writeFileSync('./data/201830-'+ blockInput +'.html',classesType);
 }
-//
-// getInput()
-//     .then(input => {return readData(input)})
-//     .then(data => {return createXML(data)})
-//     .then(formatData())
 
-http.createServer(function (req, res) {
-    if (req.url != '/favicon.ico') {
-        getInput()
-            .then(input => {return readData(input)})
-            .then(data => {return createXML(data)})
-            .then(() => {
-                formatData()
-                res.writeHead(200, {'Content-Type': 'text/html'});
-                res.write(formatData());
-                res.end();
-            })
-    }
-}).listen(8080); //the server object listens on port 8080
-
+getInput()
+    .then(input => {return readData(input)})
+    .then(data => {return createXML(data)})
+    .then(() => {formatData()})
