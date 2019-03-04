@@ -4,50 +4,35 @@ var xmldom = require('xmldom');
 var csv = require('csv-parse');
 var opn = require('opn');
 
-const data = fs.readFileSync('./data/test.xml');
-const csvdata = fs.readFileSync('./data/201830-Subject_Course Timetables - ttbl0010.csv');
-var blockInput = ""
+const csvdata = fs.readFileSync('./201830-Subject_Course Timetables - ttbl0010.csv');
 
 // asks user for input and returns it.
-function getInput() {
+function getInput(question) {
 	return new Promise (resolve => {
 		const readline = require('readline').createInterface({
 	  		input: process.stdin,
 	  		output: process.stdout
 		});
-		readline.question(`Enter the block you want to know\n`, (block) => {
-	  		console.log(`You entered ${block}!`)
+		readline.question(question, (input) => {
 	  		readline.close()
-            blockInput = block
-	  		resolve(block)
+	  		resolve(input)
 		});
 	})
 }
 
-// reads a hardcoded file and saves the data that matches input
-async function readData(input) {
-	return new Promise ((resolve, reject) => {
-		// file should be typed instead of hardcoded?
-		// should say file cant be find in data folder (if not found)
-		 csv(csvdata, {trim: true, skip_empty_lines: false, from_line: 1})
-		.on('readable', function() {
-			let data;
-			let parsedData = []
-			while (data = this.read()) {
-				// should be case insensitive
-
-				if (data[1].split(" ")[0] == input && data[0] =="Active") {
-					 parsedData.push(data)
-				}
-				else{
-					// console.log(data[1].split(" ")[0])
-				}
-			}
-			//if parsedData is empty, send error message
-			resolve(parsedData)
-		}).on('end', function() {
-		})
-	})
+// checks the working directory for the filename and returns it
+function checkFileExists(filename) {
+    return new Promise (resolve => {
+        // './'+filename --- put this in instead of hardcoded on next line
+        fs.access('./201830-Subject_Course Timetables - ttbl0010.csv', err => {
+            if (err) {
+                console.log('Could not find the file');
+                process.exit()
+            } else {
+                resolve('201830-Subject_Course Timetables - ttbl0010.csv');
+            }
+        });
+    });
 }
 
 async function createXML(dataArr) {
@@ -109,11 +94,12 @@ async function createXML(dataArr) {
         root.appendChild(spacer);
 
 	}
-    fs.writeFileSync('./data/201830-'+ blockInput +'.xml',root);
+    console.log();
+    fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '.xml',root);
 }
 
 function formatData(){
-    var data = fs.readFileSync('./data/201830-'+ blockInput +'.xml')
+    var data = fs.readFileSync('./data/' + fileDate + '-'+ blockInput +'.xml')
     var parser = new xmldom.DOMParser();
     var xmldoc = parser.parseFromString(data.toString(), 'text/xml');
     var root = xmldoc.documentElement;
@@ -146,10 +132,96 @@ function formatData(){
 
         }
     }
-    fs.writeFileSync('./data/201830-'+ blockInput +'.html',classesType);
+    fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '.html',classesType);
 }
 
-getInput()
-    .then(input => {return readData(input)})
-    .then(data => {return createXML(data)})
+async function readData() {
+    return new Promise ((resolve, reject) => {
+         csv(csvdata, {trim: true, skip_empty_lines: false, from_line: 1})
+        .on('readable', function() {
+            let data;
+            let rawData = []
+
+            // cleans each line of data before saving it
+            while (data = this.read()) {
+                for (i=0; i < data.length; i++) {
+                    data[i] = data[i].replace('*', '');
+                    data[i] = data[i].trimLeft();
+                }
+                rawData.push(data);
+            } 
+
+            if (rawData.length <= 0) {
+                console.log('No results found for "' + blockInput + '"');
+                process.exit();
+            } else {
+                resolve(rawData)
+            }
+        }).on('end', function() {
+        })
+    })
+}
+
+function getStudentData(rawData) {
+    return new Promise (resolve => {
+        var parsedData = []
+        for (i=0; i<rawData.length; i++) {
+            if (rawData[i][1].split(" ")[0] === blockInput && rawData[i][0] === "Active") {
+                if (["Mon","Tue","Wed","Thu","Fri"].includes(rawData[i][5])) {
+                    // console.log(rawData[i]);
+                    parsedData.push(rawData[i]);
+                }
+            }
+        }
+
+        if (parsedData.length <= 0) {
+            console.log('No Daytime classes found for "' + blockInput + '"');
+            process.exit();
+        } else {
+            resolve(parsedData)
+        }
+    });
+}
+
+function getTeacherData() {
+    readData()
+    .then((rawData) => {
+        teacherList = []
+        for (i=0; i<rawData.length; i++) {
+             if (rawData[i][1].split(" ")[0] === blockInput && rawData[i][0] === "Active") {
+                if (!teacherList.includes(rawData[i][8]) && rawData[i][8] != ',') {
+                    teacherList.push(rawData[i][8]);
+                }
+            }
+        }
+
+        teacherClasses = []
+        for (i=0; i<rawData.length; i++) {
+             if (teacherList.includes(rawData[i][8])) {
+                teacherClasses.push(rawData[i]);
+            }
+        }
+        console.log(teacherClasses);
+    })
+}
+
+var fileName = ''
+var fileDate = ''
+var blockInput = ''
+
+getInput('Enter the name of the file you want to use.\n')
+    .then(filenameInput => {
+        fileName = checkFileExists(filenameInput)
+        fileDate = filenameInput.split("-")[0]
+        return getInput('Enter the block you want to know ex(ACIT)\n')
+    })
+    .then((input) => {
+        blockInput = input.toUpperCase()
+        return readData()
+    })
+    .then((rawData) => {
+        return getStudentData(rawData);
+    })
+    .then(studentData => {return createXML(studentData)})
     .then(() => {formatData()})
+    .then(() => {getTeacherData()})
