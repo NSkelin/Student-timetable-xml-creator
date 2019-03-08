@@ -96,75 +96,78 @@ async function createXML(dataArr) {
         root.appendChild(spacer);
 
 	}
-    fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '.xml',root);
+    fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-students' + '.xml',root);
 }
 
-async function createTeacherXML(dataArr) {
-    var xmlFile = fs.readFileSync('./data/test.xml')
-    var parser = new xmldom.DOMParser();
-    var xmldoc = parser.parseFromString(xmlFile.toString(), 'text/xml');
-    xmldoc.getElementsByTagName('Schedule')[0].setAttribute('BLOCK', blockInput);
-    var root = xmldoc.documentElement;
-    for(var z = 0; z < root.childNodes.length; z++){
-        root.removeChild(root.childNodes[z].nodeName)
-    }
+function createTeacherXML(dataArr) {
+    return new Promise (resolve => {
+        var xmlFile = fs.readFileSync('./data/test.xml')
+        var parser = new xmldom.DOMParser();
+        var xmldoc = parser.parseFromString(xmlFile.toString(), 'text/xml');
+        xmldoc.getElementsByTagName('Schedule')[0].setAttribute('BLOCK', blockInput);
+        var root = xmldoc.documentElement;
+        for(var z = 0; z < root.childNodes.length; z++){
+            root.removeChild(root.childNodes[z].nodeName)
+        }
 
-    for(var i = 0; i <dataArr.length; i++){
-        var block = xmldoc.createElement("CLASS");
-        var crn   = xmldoc.createElement("CRN");
-        var course =  xmldoc.createElement("COURSE")
-        var type = xmldoc.createElement("TYPE");
-        var day = xmldoc.createElement("DAY");
-        var beginTime = xmldoc.createElement("BEGIN_TIME");
-        var endTime = xmldoc.createElement("END_TIME");
-        var instructor = xmldoc.createElement("INSTRUCTOR");
-        var bldRoom = xmldoc.createElement("BLDG_ROOM");
-        var startDate = xmldoc.createElement("START_DATE");
-        var endDate = xmldoc.createElement("END_DATE");
-        var max = xmldoc.createElement("MAX.");
-        var act = xmldoc.createElement("ACT.");
-        var hrs = xmldoc.createElement("HRS");
-        var spacer =  xmldoc.createTextNode("\n")
+        for(var i = 0; i <dataArr.length; i++){
+            var block = xmldoc.createElement("CLASS");
+            var crn   = xmldoc.createElement("CRN");
+            var course =  xmldoc.createElement("COURSE")
+            var type = xmldoc.createElement("TYPE");
+            var day = xmldoc.createElement("DAY");
+            var beginTime = xmldoc.createElement("BEGIN_TIME");
+            var endTime = xmldoc.createElement("END_TIME");
+            var instructor = xmldoc.createElement("INSTRUCTOR");
+            var bldRoom = xmldoc.createElement("BLDG_ROOM");
+            var startDate = xmldoc.createElement("START_DATE");
+            var endDate = xmldoc.createElement("END_DATE");
+            var max = xmldoc.createElement("MAX.");
+            var act = xmldoc.createElement("ACT.");
+            var hrs = xmldoc.createElement("HRS");
+            var spacer =  xmldoc.createTextNode("\n")
 
-        block.setAttribute("BLOCK",dataArr[i][1]);
-        crn.textContent = dataArr[i][2];
-        instructor.textContent = dataArr[i][8];
-        instructor.setAttribute("teacher",dataArr[i][8]);
-        course.textContent = dataArr[i][3];
-        type.textContent = dataArr[i][4];
-        day.textContent = dataArr[i][5];
-        beginTime.textContent = dataArr[i][6];
-        endTime.textContent = dataArr[i][7];
-        bldRoom.textContent = dataArr[i][9];
-        startDate.textContent = dataArr[i][10];
-        endDate.textContent = dataArr[i][11];
-        max.textContent = dataArr[i][12];
-        act.textContent = dataArr[i][13];
-        hrs.textContent = dataArr[i][14];
+            block.setAttribute("BLOCK",dataArr[i][1]);
+            crn.textContent = dataArr[i][2];
+            instructor.textContent = dataArr[i][8];
+            instructor.setAttribute("teacher",dataArr[i][8]);
+            course.textContent = dataArr[i][3];
+            type.textContent = dataArr[i][4];
+            day.textContent = dataArr[i][5];
+            beginTime.textContent = dataArr[i][6];
+            endTime.textContent = dataArr[i][7];
+            bldRoom.textContent = dataArr[i][9];
+            startDate.textContent = dataArr[i][10];
+            endDate.textContent = dataArr[i][11];
+            max.textContent = dataArr[i][12];
+            act.textContent = dataArr[i][13];
+            hrs.textContent = dataArr[i][14];
 
-        block.appendChild(crn);
-        block.appendChild(instructor);
-        block.appendChild(course);
-        block.appendChild(type);
-        block.appendChild(day);
-        block.appendChild(beginTime);
-        block.appendChild(endTime);
-        block.appendChild(bldRoom);
-        block.appendChild(startDate);
-        block.appendChild(endDate);
-        block.appendChild(max);
-        block.appendChild(act);
-        block.appendChild(hrs);
+            block.appendChild(crn);
+            block.appendChild(instructor);
+            block.appendChild(course);
+            block.appendChild(type);
+            block.appendChild(day);
+            block.appendChild(beginTime);
+            block.appendChild(endTime);
+            block.appendChild(bldRoom);
+            block.appendChild(startDate);
+            block.appendChild(endDate);
+            block.appendChild(max);
+            block.appendChild(act);
+            block.appendChild(hrs);
 
-        root.appendChild(block);
-        root.appendChild(spacer);
+            root.appendChild(block);
+            root.appendChild(spacer);
 
-    }
-    fs.writeFileSync('./data/' + fileDate + '-' + "-acit-instructors" + '.xml',root);
+        }
+        fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-instructors' + '.xml',root);
+        resolve();
+    })
 }
 
 function formatData(){
-    var data = fs.readFileSync('./data/' + fileDate + '-'+ blockInput +'.xml')
+    var data = fs.readFileSync('./data/' + fileDate + '-'+ blockInput + '-students' + '.xml')
     var parser = new xmldom.DOMParser();
     var xmldoc = parser.parseFromString(data.toString(), 'text/xml');
     var root = xmldoc.documentElement;
@@ -198,12 +201,12 @@ function formatData(){
 
         }
     }
-    fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '.html',classesType);
+    fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-students' + '.html',classesType);
 }
 
 
 function formatTeacherHtmltData(){
-    var data = fs.readFileSync('./data/' + fileDate + '-'+ blockInput +'.xml')
+    var data = fs.readFileSync('./data/' + fileDate + '-'+ blockInput + '-instructors' + '.xml')
     var parser = new xmldom.DOMParser();
     var xmldoc = parser.parseFromString(data.toString(), 'text/xml');
     var root = xmldoc.documentElement;
@@ -230,7 +233,7 @@ function formatTeacherHtmltData(){
         for (var z = 0; z < x.length; z++) {
             if(x[z].childNodes != null) {
                 for (var f = 0; f < x[z].childNodes.length; f++) {
-                    console.log(x[z].childNodes[f].nodeName);
+                    // console.log(x[z].childNodes[f].nodeName);
                     if (x[z].childNodes[f].nodeName == "INSTRUCTOR") {
                         if(x[z].childNodes[f].getAttribute("teacher") == classDates[a]){
 
@@ -247,7 +250,7 @@ function formatTeacherHtmltData(){
             }
         }
     }
-    fs.writeFileSync('./data/' + fileDate+" teacher" + '-' + blockInput + '.html',classesType);
+    fs.writeFileSync('./data/' + fileDate + '-' + blockInput + "-instructors" +'.html',classesType);
 }
 
 // Reads a file and cleans it before returning it as an array
@@ -267,18 +270,13 @@ async function readData() {
                 }
                 rawData.push(data);
             } 
-
-
-            // if (rawData.length <= 0) {
-            //     console.log('No results found for "' + blockInput + '"');
-            //     process.exit();
-            // } else {
-            //     resolve()
-            // }
-            //code is syncrohnous so methods are being called way to early
-
         }).on('end', function() {
-             resolve(rawData);
+            if (rawData.length <= 0) {
+                console.log('No results found for "' + blockInput + '"');
+                process.exit();
+            } else {
+                resolve(rawData)
+            }
          })
     })
 }
@@ -348,8 +346,10 @@ getInput('Enter the name of the file you want to use.\n')
     .then(studentData => {return createXML(studentData)})
     .then(() => {formatData()})
     .then(() => {getTeacherData()})
-    .then(() =>{readData().then((data) =>{ createTeacherXML(data)})
+    .then(() =>{
+        return readData()
     })
+    .then((data) =>{createTeacherXML(data)})
     .then(() =>{
         formatTeacherHtmltData()
     })
