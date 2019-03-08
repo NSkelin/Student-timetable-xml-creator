@@ -201,6 +201,7 @@ function formatData(){
     fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '.html',classesType);
 }
 
+
 function formatTeacherHtmltData(){
     var data = fs.readFileSync('./data/' + fileDate + '-'+ blockInput +'.xml')
     var parser = new xmldom.DOMParser();
@@ -249,6 +250,7 @@ function formatTeacherHtmltData(){
     fs.writeFileSync('./data/' + fileDate+" teacher" + '-' + blockInput + '.html',classesType);
 }
 
+// Reads a file and cleans it before returning it as an array
 async function readData() {
     return new Promise ((resolve, reject) => {
         let rawData = []
@@ -257,7 +259,6 @@ async function readData() {
             let data;
 
 
-            // cleans each line of data before saving it
             while (data = this.read()) {
                 for (i=0; i < data.length; i++) {
                     data[i] = data[i].replace('*', '');
@@ -266,6 +267,7 @@ async function readData() {
                 }
                 rawData.push(data);
             } 
+
 
             // if (rawData.length <= 0) {
             //     console.log('No results found for "' + blockInput + '"');
@@ -282,13 +284,14 @@ async function readData() {
 }
 
 
+// loops through an array and returns filtered student data.
+
 function getStudentData(rawData) {
     return new Promise (resolve => {
         var parsedData = []
         for (i=0; i<rawData.length; i++) {
             if (rawData[i][1].split(" ")[0] === blockInput && rawData[i][0] === "Active") {
                 if (["Mon","Tue","Wed","Thu","Fri"].includes(rawData[i][5])) {
-                    // console.log(rawData[i]);
                     parsedData.push(rawData[i]);
                 }
             }
@@ -303,6 +306,7 @@ function getStudentData(rawData) {
     });
 }
 
+// loops through an array to find the teachers for a program then returns all courses those teachers teach.
 function getTeacherData() {
     readData()
     .then((rawData) => {
