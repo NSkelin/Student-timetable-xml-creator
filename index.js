@@ -135,6 +135,7 @@ function formatData(){
     fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '.html',classesType);
 }
 
+// Reads a file and cleans it before returning it as an array
 async function readData() {
     return new Promise ((resolve, reject) => {
          csv(csvdata, {trim: true, skip_empty_lines: false, from_line: 1})
@@ -142,7 +143,6 @@ async function readData() {
             let data;
             let rawData = []
 
-            // cleans each line of data before saving it
             while (data = this.read()) {
                 for (i=0; i < data.length; i++) {
                     data[i] = data[i].replace('*', '');
@@ -150,25 +150,24 @@ async function readData() {
                 }
                 rawData.push(data);
             } 
-
+        }).on('end', function() {
             if (rawData.length <= 0) {
                 console.log('No results found for "' + blockInput + '"');
                 process.exit();
             } else {
                 resolve(rawData)
             }
-        }).on('end', function() {
         })
     })
 }
 
+// loops through an array and returns filtered student data.
 function getStudentData(rawData) {
     return new Promise (resolve => {
         var parsedData = []
         for (i=0; i<rawData.length; i++) {
             if (rawData[i][1].split(" ")[0] === blockInput && rawData[i][0] === "Active") {
                 if (["Mon","Tue","Wed","Thu","Fri"].includes(rawData[i][5])) {
-                    // console.log(rawData[i]);
                     parsedData.push(rawData[i]);
                 }
             }
@@ -183,6 +182,7 @@ function getStudentData(rawData) {
     });
 }
 
+// loops through an array to find the teachers for a program then returns all courses those teachers teach.
 function getTeacherData() {
     readData()
     .then((rawData) => {
@@ -201,7 +201,6 @@ function getTeacherData() {
                 teacherClasses.push(rawData[i]);
             }
         }
-        console.log(teacherClasses);
     })
 }
 
