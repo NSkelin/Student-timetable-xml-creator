@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <!-- the root element -->
+    <xs:element name="Schedule">  
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="CLASS" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="BLOCK" type="xs:string"/>
+        </xs:complexType>   
+    </xs:element>
+
+    <xs:element name='CLASS'>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name='CRN' type="xs:integer"/>
+                <xs:element name='COURSE' type="xs:string"/>
+                <xs:element name='TYPE' type="xs:string"/>
+                <xs:element name='DAY' type="xs:week"/>
+                <xs:element name='BEGIN_TIME' type="classStart"/>
+                <xs:element name='END_TIME' type="classEnd"/>
+                <xs:element name='INSTRUCTOR' type="xs:string"/>
+                <xs:element name='BLDG_ROOM' type="xs:string"/>
+                <xs:element name='START_DATE' type="xs:date"/>
+                <xs:element name='END_DATE' type="xs:date"/>
+                <xs:element name='MAX' type="xs:integer"/>
+                <xs:element name='ACT.' type="xs:integer"/>
+                <xs:element name='HRS' type="xs:decimal"/>
+            </xs:sequence>
+            <xs:attribute name="BLOCK" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- simpletype to only allow week days -->
+    <xs:simpleType name="week">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Mon"/>
+            <xs:enumeration value="Tue"/>
+            <xs:enumeration value="Wed"/>
+            <xs:enumeration value="Thu"/>
+            <xs:enumeration value="Fri"/>
+        </xs:restriction>
+    </xs:simpleType>  
+
+    <!-- Simpletype to set the times class can start -->
+    <xs:simpleType name="classStart">
+        <xs:restriction base="xs:integer">
+            <xs:minInclusive value="830"/>
+            <xs:maxInclusive value="1330"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Simpletype to set the times class can end -->
+    <xs:simpleType name="classEnd">
+        <xs:restriction base="xs:integer">
+            <xs:minInclusive value="1130"/>
+            <xs:maxInclusive value="1630"/>
+        </xs:restriction>
+    </xs:simpleType>    
+
+</xs:schema>
