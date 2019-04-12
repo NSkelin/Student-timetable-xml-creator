@@ -35,68 +35,59 @@ function checkFileExists(filename) {
     });
 }
 
-async function createXML(dataArr) {
+async function createStudentXML(dataArr) {
     var xmlFile = fs.readFileSync('./data/test.xml')
     var parser = new xmldom.DOMParser();
     var xmldoc = parser.parseFromString(xmlFile.toString(), 'text/xml');
-    xmldoc.getElementsByTagName('Schedule')[0].setAttribute('BLOCK', blockInput);
-    var root = xmldoc.documentElement;
-    for(var z = 0; z < root.childNodes.length; z++){
-        root.removeChild(root.childNodes[z].nodeName)
+    xmldoc.getElementsByTagName('Schedule')[0].setAttribute('program', blockInput);
+    var rootxml = xmldoc.documentElement;
+    for(var z = 0; z < rootxml.childNodes.length; z++){
+        rootxml.removeChild(rootxml.childNodes[z].nodeName)
     }
-
     for(var i = 0; i <dataArr.length; i++){
-    	var block = xmldoc.createElement("CLASS");
-        var crn   = xmldoc.createElement("CRN");
-        var course =  xmldoc.createElement("COURSE")
-        var type = xmldoc.createElement("TYPE");
-        var day = xmldoc.createElement("DAY");
-        var beginTime = xmldoc.createElement("BEGIN_TIME");
-        var endTime = xmldoc.createElement("END_TIME");
-        var instructor = xmldoc.createElement("INSTRUCTOR");
-        var bldRoom = xmldoc.createElement("BLDG_ROOM");
-        var startDate = xmldoc.createElement("START_DATE");
-        var endDate = xmldoc.createElement("END_DATE");
-        var max = xmldoc.createElement("MAX.");
-        var act = xmldoc.createElement("ACT.");
-        var hrs = xmldoc.createElement("HRS");
-        var spacer =  xmldoc.createTextNode("\n")
+        // creates xml elements
+        var course =  xmldoc.createElement("class")
+        var day = xmldoc.createElement("day");
+        var beginTime = xmldoc.createElement("start_time");
+        var endTime = xmldoc.createElement("end_time");
+        var bldRoom = xmldoc.createElement("bldg_room");
+        var instructor = xmldoc.createElement("instructor");
 
-        block.setAttribute("BLOCK",dataArr[i][1]);
-        crn.textContent = dataArr[i][2];
-        course.textContent = dataArr[i][3];
-        type.textContent = dataArr[i][4];
-        instructor.setAttribute("teacher",dataArr[i][8]);
+        // populates xml elements
+        course.setAttribute('course',dataArr[i][3]);
         day.textContent = dataArr[i][5];
         beginTime.textContent = dataArr[i][6];
         endTime.textContent = dataArr[i][7];
-        instructor.textContent = dataArr[i][8];
         bldRoom.textContent = dataArr[i][9];
-        startDate.textContent = dataArr[i][10];
-        endDate.textContent = dataArr[i][11];
-        max.textContent = dataArr[i][12];
-        act.textContent = dataArr[i][13];
-        hrs.textContent = dataArr[i][14];
+        instructor.textContent = dataArr[i][8];
 
-        block.appendChild(crn);
+        // adds xml elements under course
+        course.appendChild(day);
+        course.appendChild(beginTime);
+        course.appendChild(endTime);
+        course.appendChild(instructor);
+        course.appendChild(bldRoom);
+
+        // creates a section if it doesnt already exist (ex acit 1 a)
+        section = rootxml.getElementsByTagName('section')
+        var block;
+        if(!section[0]) {
+            block = xmldoc.createElement("section");
+            block.setAttribute("block",dataArr[i][1]);
+        }
+        for (n=0; n<section.length; n++) {
+            if(section[n].getAttribute('block') === dataArr[i][1]) {
+                block = section[n];
+            } else {
+                block = xmldoc.createElement("section");
+                block.setAttribute("block",dataArr[i][1]);
+            }
+        }
+
         block.appendChild(course);
-        block.appendChild(type);
-        block.appendChild(day);
-        block.appendChild(beginTime);
-        block.appendChild(endTime);
-        block.appendChild(instructor);
-        block.appendChild(bldRoom);
-        block.appendChild(startDate);
-        block.appendChild(endDate);
-        block.appendChild(max);
-        block.appendChild(act);
-        block.appendChild(hrs);
-
-		root.appendChild(block);
-        root.appendChild(spacer);
-
+		rootxml.appendChild(block);
 	}
-    fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-students' + '.xml',root);
+    fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-students' + '.xml',rootxml);
 }
 
 function createTeacherXML(dataArr) {
@@ -280,23 +271,24 @@ async function readData() {
     })
 }
 
-// loops through an array and returns filtered student data.
+// checks to see if the data matches the inputed block (ex acit), whether its active,
+// and if its mon - fri. if not it stops the program.
 function getStudentData(rawData) {
     return new Promise (resolve => {
-        var parsedData = []
+        var checkedData = []
         for (i=0; i<rawData.length; i++) {
             if (rawData[i][1].split(" ")[0] === blockInput && rawData[i][0] === "Active") {
                 if (["Mon","Tue","Wed","Thu","Fri"].includes(rawData[i][5])) {
-                    parsedData.push(rawData[i]);
+                    checkedData.push(rawData[i]);
                 }
             }
         }
 
-        if (parsedData.length <= 0) {
+        if (checkedData.length <= 0) {
             console.log('No Daytime classes found for "' + blockInput + '"');
             process.exit();
         } else {
-            resolve(parsedData)
+            resolve(checkedData)
         }
     });
 }
@@ -327,20 +319,23 @@ var fileName = '';
 var fileDate = '201830';
 var blockInput = '';
 
-// getInput('Enter the name of the file you want to use.\n')
-//     .then(filenameInput => {
-//         fileName = checkFileExists(filenameInput)
-//         fileDate = filenameInput.split("-")[0]
-//     })
-    // .then(() => {
+// remove comments on the lines labeled "<--this" to have the program
+// ask for filename instead of being hardcoded.
+
+// getInput('Enter the name of the file you want to use.\n')    <--this
+//     .then(filenameInput => {                                 <--this
+//         fileName = checkFileExists(filenameInput)            <--this
+//         fileDate = filenameInput.split("-")[0]               <--this
+//     })                                                       <--this
+    // .then(() => {                                            <--this
         blockInput = process.argv[2];
         blockInput = blockInput.toUpperCase();
         return readData()
-    // })
+    // })                                                       <--this
     .then((rawData) => {
         return getStudentData(rawData);
     })
-    .then(studentData => {return createXML(studentData)})
+    .then(studentData => {return createStudentXML(studentData)})
     .then(() => {formatData()})
     .then(() => {getTeacherData()})
     .then(() =>{
