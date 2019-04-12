@@ -20,21 +20,21 @@ function getInput(question) {
 	})
 }
 
-// checks the working directory for the filename and returns it
+// checks the working directory for the filename and returns it.
 function checkFileExists(filename) {
     return new Promise (resolve => {
-        // './'+filename --- put this in instead of hardcoded on next line
-        fs.access('./201830-Subject_Course Timetables - ttbl0010.csv', err => {
+        fs.access('./'+filename, err => {
             if (err) {
                 console.log('Could not find the file');
                 process.exit()
             } else {
-                resolve('201830-Subject_Course Timetables - ttbl0010.csv');
+                resolve(filename);
             }
         });
     });
 }
 
+// creates the students xml file.
 async function createStudentXML(dataArr) {
     var xmlFile = fs.readFileSync('./data/test.xml')
     var parser = new xmldom.DOMParser();
@@ -157,45 +157,38 @@ function createTeacherXML(dataArr) {
     })
 }
 
-function formatData(){
+// creates the students html file.
+function createStudentHTML() {
+    // loads the xml
     var data = fs.readFileSync('./data/' + fileDate + '-'+ blockInput + '-students' + '.xml')
     var parser = new xmldom.DOMParser();
     var xmldoc = parser.parseFromString(data.toString(), 'text/xml');
-    var root = xmldoc.documentElement;
+    var rootxml = xmldoc.documentElement;
 
-    var classesType ='<h1>'+ root.getAttribute("BLOCK") +'</h1>';
-    var x = root.childNodes;
-    var classDates = [];
+    var HTMLcode ='<h1>'+ rootxml.getAttribute("program") +'</h1>';
+    var sections = rootxml.getElementsByTagName('section');
 
-    for(var i = 0;  i < x.length; i++){
-        if(x[i].nodeName=="CLASS"){
-            classDates.indexOf(x[i].getAttribute("BLOCK")) === -1?  classDates.push(x[i].getAttribute("BLOCK")):""
+    for(i=0; i<sections.length; i++) {
+        section = sections[i].getAttribute('block');
+        HTMLcode += '<h2>' + section + '</h2>';
+
+        var courses = sections[i].getElementsByTagName('class')
+        for(n=0; n<courses.length; n++) {
+            var course = courses[n].getAttribute('course');
+            var day = courses[i].getElementsByTagName('day')
+            var start_time = courses[i].getElementsByTagName('start_time')
+            var end_time = courses[i].getElementsByTagName('end_time')
+            var instructor = courses[i].getElementsByTagName('instructor')
+            var bldg_room = courses[i].getElementsByTagName('bldg_room')
+
+            HTMLcode += course + ' start: ' + start_time + ' end: ' + end_time + 
+            ' instructor: ' + instructor + ' building room: ' + bldg_room + '<br>';
         }
     }
-
-    for(var a = 0; a < classDates.length; a++) {
-        classesType+= '<h2>'+ classDates[a]+"</h2>";
-        classesType+='<ul>'
-        for (var z = 0; z < x.length; z++) {
-            if (x[z].nodeName == "CLASS") {
-                if(x[z].getAttribute("BLOCK") == classDates[a]){
-
-                    var kidNodes = x[z].childNodes;
-                    classesType+=' <li>'
-                    for(var p = 0;  p < kidNodes.length;p++){
-                        classesType += kidNodes[p].nodeName + ": " + kidNodes[p].textContent+ ""
-                    }
-                    classesType+= "</li> ";
-                }
-            }
-        classesType+='</ul>';
-
-        }
-    }
-    fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-students' + '.html',classesType);
+    fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-students' + '.html', HTMLcode);
 }
 
-function formatTeacherHtmltData(){
+function createTeacherHTML(){
     var data = fs.readFileSync('./data/' + fileDate + '-'+ blockInput + '-instructors' + '.xml')
     var parser = new xmldom.DOMParser();
     var xmldoc = parser.parseFromString(data.toString(), 'text/xml');
@@ -243,7 +236,7 @@ function formatTeacherHtmltData(){
     fs.writeFileSync('./data/' + fileDate + '-' + blockInput + "-instructors" +'.html',classesType);
 }
 
-// Reads a file and cleans it before returning it as an array
+// Reads a file and cleans it before returning it as an array.
 async function readData() {
     return new Promise ((resolve, reject) => {
         let rawData = []
@@ -271,8 +264,8 @@ async function readData() {
     })
 }
 
-// checks to see if the data matches the inputed block (ex acit), whether its active,
-// and if its mon - fri. if not it stops the program.
+// returns the data that matches the inputed block (ex acit), whether its active,
+// and if its mon - fri. if none match it stops the program.
 function getStudentData(rawData) {
     return new Promise (resolve => {
         var checkedData = []
@@ -336,14 +329,14 @@ var blockInput = '';
         return getStudentData(rawData);
     })
     .then(studentData => {return createStudentXML(studentData)})
-    .then(() => {formatData()})
+    .then(() => {createStudentHTML()})
     .then(() => {getTeacherData()})
     .then(() =>{
         return readData()
     })
     .then((data) =>{createTeacherXML(data)})
     .then(() =>{
-        formatTeacherHtmltData()
+        createTeacherHTML()
     })
 
 
