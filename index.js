@@ -204,7 +204,6 @@ function formatData(){
     fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-students' + '.html',classesType);
 }
 
-
 function formatTeacherHtmltData(){
     var data = fs.readFileSync('./data/' + fileDate + '-'+ blockInput + '-instructors' + '.xml')
     var parser = new xmldom.DOMParser();
@@ -281,9 +280,7 @@ async function readData() {
     })
 }
 
-
 // loops through an array and returns filtered student data.
-
 function getStudentData(rawData) {
     return new Promise (resolve => {
         var parsedData = []
@@ -327,19 +324,19 @@ function getTeacherData() {
 }
 
 var fileName = '';
-var fileDate = '';
+var fileDate = '201830';
 var blockInput = '';
 
-getInput('Enter the name of the file you want to use.\n')
-    .then(filenameInput => {
-        fileName = checkFileExists(filenameInput)
-        fileDate = filenameInput.split("-")[0]
-        return getInput('Enter the block you want to know ex(ACIT)\n')
-    })
-    .then((input) => {
-        blockInput = input.toUpperCase()
+// getInput('Enter the name of the file you want to use.\n')
+//     .then(filenameInput => {
+//         fileName = checkFileExists(filenameInput)
+//         fileDate = filenameInput.split("-")[0]
+//     })
+    // .then(() => {
+        blockInput = process.argv[2];
+        blockInput = blockInput.toUpperCase();
         return readData()
-    })
+    // })
     .then((rawData) => {
         return getStudentData(rawData);
     })
