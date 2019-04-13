@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <!-- the root element -->
+    <xs:element name="Schedule">  
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="instructor" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="program" type="xs:string"/>
+        </xs:complexType>   
+    </xs:element>
+
+    <xs:element name="instructor">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="class" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="name" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name='class'>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name='day' type="week"/>
+                <xs:element name='start_time' type="classStart"/>
+                <xs:element name='end_time' type="classEnd"/>
+                <xs:element name='bldg_room' type="xs:string"/>
+            </xs:sequence>
+            <xs:attribute name="course" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- simpletype to only allow week days -->
+    <xs:simpleType name="week">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Mon"/>
+            <xs:enumeration value="Tue"/>
+            <xs:enumeration value="Wed"/>
+            <xs:enumeration value="Thu"/>
+            <xs:enumeration value="Fri"/>
+        </xs:restriction>
+    </xs:simpleType>  
+
+    <!-- Simpletype to set the times class can start -->
+    <xs:simpleType name="classStart">
+        <xs:restriction base="xs:integer">
+            <xs:minInclusive value="830"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Simpletype to set the times class can end -->
+    <xs:simpleType name="classEnd">
+        <xs:restriction base="xs:integer">
+            <xs:maxInclusive value="1720"/>
+        </xs:restriction>
+    </xs:simpleType>    
+
+</xs:schema>
