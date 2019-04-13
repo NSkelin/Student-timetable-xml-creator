@@ -4,7 +4,9 @@ var xmldom = require('xmldom');
 var csv = require('csv-parse');
 var opn = require('opn');
 
-const csvdata = fs.readFileSync('./201830-Subject_Course Timetables - ttbl0010.csv');
+var fileName = '201830-Subject_Course Timetables - ttbl0010.csv';
+var fileDate = '201830';
+var blockInput = '';
 
 // asks user for input and returns it.
 function getInput(question) {
@@ -215,10 +217,10 @@ function createTeacherHTML(){
 async function readData() {
     return new Promise ((resolve, reject) => {
         let rawData = []
-         csv(csvdata, {trim: true, skip_empty_lines: false, from_line: 1})
+        var csvdata = fs.readFileSync('./'+fileName);
+        csv(csvdata, {trim: true, skip_empty_lines: false, from_line: 1})
         .on('readable', function() {
             let data;
-
 
             while (data = this.read()) {
                 for (i=0; i < data.length; i++) {
@@ -283,25 +285,10 @@ function getTeacherData(rawData) {
     })
 }
 
-var fileName = '';
-var fileDate = '201830';
-var blockInput = '';
-
-// below is what runs the program
-
-// remove comments on the lines labeled "<--this" to have the program
-// ask for filename instead of being hardcoded.
-
-// getInput('Enter the name of the file you want to use.\n')    <--this
-//     .then(filenameInput => {                                 <--this
-//         fileName = checkFileExists(filenameInput)            <--this
-//         fileDate = filenameInput.split("-")[0]               <--this
-//     })                                                       <--this
-    // .then(() => {                                            <--this
-        blockInput = process.argv[2];
-        blockInput = blockInput.toUpperCase();
-        return readData()
-    // })                                                       <--this
+// below is what runs the program                                  
+    blockInput = process.argv[2];
+    blockInput = blockInput.toUpperCase();
+    return readData()                                                   
     .then((rawData) => {
         return getStudentData(rawData);
     })
