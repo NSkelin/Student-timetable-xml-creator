@@ -90,69 +90,59 @@ async function createStudentXML(dataArr) {
     fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-students' + '.xml',rootxml);
 }
 
+// creates the teachers xml file.
 function createTeacherXML(dataArr) {
     return new Promise (resolve => {
         var xmlFile = fs.readFileSync('./data/test.xml')
         var parser = new xmldom.DOMParser();
         var xmldoc = parser.parseFromString(xmlFile.toString(), 'text/xml');
         xmldoc.getElementsByTagName('Schedule')[0].setAttribute('BLOCK', blockInput);
-        var root = xmldoc.documentElement;
-        for(var z = 0; z < root.childNodes.length; z++){
-            root.removeChild(root.childNodes[z].nodeName)
+        var rootxml = xmldoc.documentElement;
+        for(var z = 0; z < rootxml.childNodes.length; z++){
+            rootxml.removeChild(rootxml.childNodes[z].nodeName)
         }
 
         for(var i = 0; i <dataArr.length; i++){
-            var block = xmldoc.createElement("CLASS");
-            var crn   = xmldoc.createElement("CRN");
-            var course =  xmldoc.createElement("COURSE")
-            var type = xmldoc.createElement("TYPE");
-            var day = xmldoc.createElement("DAY");
-            var beginTime = xmldoc.createElement("BEGIN_TIME");
-            var endTime = xmldoc.createElement("END_TIME");
-            var instructor = xmldoc.createElement("INSTRUCTOR");
-            var bldRoom = xmldoc.createElement("BLDG_ROOM");
-            var startDate = xmldoc.createElement("START_DATE");
-            var endDate = xmldoc.createElement("END_DATE");
-            var max = xmldoc.createElement("MAX.");
-            var act = xmldoc.createElement("ACT.");
-            var hrs = xmldoc.createElement("HRS");
-            var spacer =  xmldoc.createTextNode("\n")
+            var instructor = xmldoc.createElement("instrctor");
+            var course =  xmldoc.createElement("class")
+            var day = xmldoc.createElement("day");
+            var beginTime = xmldoc.createElement("start_time");
+            var endTime = xmldoc.createElement("end_time");
+            var bldgRoom = xmldoc.createElement("bldg_room");
 
-            block.setAttribute("BLOCK",dataArr[i][1]);
-            crn.textContent = dataArr[i][2];
-            instructor.textContent = dataArr[i][8];
-            instructor.setAttribute("teacher",dataArr[i][8]);
-            course.textContent = dataArr[i][3];
-            type.textContent = dataArr[i][4];
+            instructor.setAttribute("name", dataArr[i][8]);
+            course.setAttribute("course", dataArr[i][3]);
             day.textContent = dataArr[i][5];
             beginTime.textContent = dataArr[i][6];
             endTime.textContent = dataArr[i][7];
-            bldRoom.textContent = dataArr[i][9];
-            startDate.textContent = dataArr[i][10];
-            endDate.textContent = dataArr[i][11];
-            max.textContent = dataArr[i][12];
-            act.textContent = dataArr[i][13];
-            hrs.textContent = dataArr[i][14];
+            bldgRoom.textContent = dataArr[i][9];
 
-            block.appendChild(crn);
-            block.appendChild(instructor);
-            block.appendChild(course);
-            block.appendChild(type);
-            block.appendChild(day);
-            block.appendChild(beginTime);
-            block.appendChild(endTime);
-            block.appendChild(bldRoom);
-            block.appendChild(startDate);
-            block.appendChild(endDate);
-            block.appendChild(max);
-            block.appendChild(act);
-            block.appendChild(hrs);
+            course.appendChild(day);
+            course.appendChild(beginTime);
+            course.appendChild(endTime);
+            course.appendChild(bldgRoom);
 
-            root.appendChild(block);
-            root.appendChild(spacer);
+            // creates a instructor if it doesnt already exist
+            // course = rootxml.getElementsByTagName('course')
+            // var instructor;
+            // if(!course[0]) {
+            //     instructor = xmldoc.createElement("course");
+            //     instructor.setAttribute("instructor",dataArr[i][1]);
+            // }
+            // for (n=0; n<course.length; n++) {
+            //     if(course[n].getAttribute('instructor') === dataArr[i][1]) {
+            //         instructor = course[n];
+            //     } else {
+            //         instructor = xmldoc.createElement("course");
+            //         instructor.setAttribute("instructor",dataArr[i][1]);
+            //     }
+            // }
+
+            instructor.appendChild(course);
+            rootxml.appendChild(instructor);
 
         }
-        fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-instructors' + '.xml',root);
+        fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-instructors' + '.xml',rootxml);
         resolve();
     })
 }
@@ -188,6 +178,7 @@ function createStudentHTML() {
     fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-students' + '.html', HTMLcode);
 }
 
+// creates the teachers html file.
 function createTeacherHTML(){
     var data = fs.readFileSync('./data/' + fileDate + '-'+ blockInput + '-instructors' + '.xml')
     var parser = new xmldom.DOMParser();
@@ -287,9 +278,8 @@ function getStudentData(rawData) {
 }
 
 // loops through an array to find the teachers for a program then returns all courses those teachers teach.
-function getTeacherData() {
-    readData()
-    .then((rawData) => {
+function getTeacherData(rawData) {
+    return new Promise (resolve => {
         let teacherList = []
         for (let i=0; i<rawData.length; i++) {
              if (rawData[i][1].split(" ")[0] === blockInput && rawData[i][0] === "Active") {
@@ -305,6 +295,7 @@ function getTeacherData() {
                 teacherClasses.push(rawData[i]);
             }
         }
+        resolve(teacherClasses)
     })
 }
 
@@ -328,16 +319,19 @@ var blockInput = '';
     .then((rawData) => {
         return getStudentData(rawData);
     })
-    .then(studentData => {return createStudentXML(studentData)})
-    .then(() => {createStudentHTML()})
-    .then(() => {getTeacherData()})
+    .then(studentData => {
+        return createStudentXML(studentData)
+    })
+    .then(() => {
+        createStudentHTML()
+    })
     .then(() =>{
         return readData()
     })
-    .then((data) =>{createTeacherXML(data)})
+    .then((rawData) => {
+        return getTeacherData(rawData)
+    })
+    .then((teacherData) =>{createTeacherXML(teacherData)})
     .then(() =>{
         createTeacherHTML()
     })
-
-
-
