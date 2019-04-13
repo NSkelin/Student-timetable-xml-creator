@@ -148,7 +148,7 @@ function createTeacherXML(dataArr) {
             rootxml.appendChild(block);
 
         }
-        validateXML('./data/' + fileDate + '-' + blockInput + '-students' + '.xml', './data/instructor_schedule.xsd')
+        validateXML('./data/' + fileDate + '-' + blockInput + '-instructors' + '.xml', './data/instructor_schedule.xsd')
         fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-instructors' + '.xml',rootxml);
         resolve();
     })
