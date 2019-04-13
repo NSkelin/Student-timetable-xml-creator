@@ -78,6 +78,7 @@ async function createStudentXML(dataArr) {
         for (n=0; n<section.length; n++) {
             if(section[n].getAttribute('block') === dataArr[i][1]) {
                 block = section[n];
+                break;
             } else {
                 block = xmldoc.createElement("section");
                 block.setAttribute("block",dataArr[i][1]);
@@ -96,50 +97,52 @@ function createTeacherXML(dataArr) {
         var xmlFile = fs.readFileSync('./data/test.xml')
         var parser = new xmldom.DOMParser();
         var xmldoc = parser.parseFromString(xmlFile.toString(), 'text/xml');
-        xmldoc.getElementsByTagName('Schedule')[0].setAttribute('BLOCK', blockInput);
+        xmldoc.getElementsByTagName('Schedule')[0].setAttribute('program', blockInput);
         var rootxml = xmldoc.documentElement;
-        for(var z = 0; z < rootxml.childNodes.length; z++){
+        for (var z = 0; z < rootxml.childNodes.length; z++) {
             rootxml.removeChild(rootxml.childNodes[z].nodeName)
         }
 
-        for(var i = 0; i <dataArr.length; i++){
-            var instructor = xmldoc.createElement("instrctor");
+        for(var i = 0; i <dataArr.length; i++) {
+            // creates xml elements
             var course =  xmldoc.createElement("class")
             var day = xmldoc.createElement("day");
             var beginTime = xmldoc.createElement("start_time");
             var endTime = xmldoc.createElement("end_time");
-            var bldgRoom = xmldoc.createElement("bldg_room");
+            var bldRoom = xmldoc.createElement("bldg_room");
 
-            instructor.setAttribute("name", dataArr[i][8]);
-            course.setAttribute("course", dataArr[i][3]);
+            // populates xml elements
+            course.setAttribute('course',dataArr[i][3]);
             day.textContent = dataArr[i][5];
             beginTime.textContent = dataArr[i][6];
             endTime.textContent = dataArr[i][7];
-            bldgRoom.textContent = dataArr[i][9];
+            bldRoom.textContent = dataArr[i][9];
 
+            // adds xml elements under course
             course.appendChild(day);
             course.appendChild(beginTime);
             course.appendChild(endTime);
-            course.appendChild(bldgRoom);
+            course.appendChild(bldRoom);
 
-            // creates a instructor if it doesnt already exist
-            // course = rootxml.getElementsByTagName('course')
-            // var instructor;
-            // if(!course[0]) {
-            //     instructor = xmldoc.createElement("course");
-            //     instructor.setAttribute("instructor",dataArr[i][1]);
-            // }
-            // for (n=0; n<course.length; n++) {
-            //     if(course[n].getAttribute('instructor') === dataArr[i][1]) {
-            //         instructor = course[n];
-            //     } else {
-            //         instructor = xmldoc.createElement("course");
-            //         instructor.setAttribute("instructor",dataArr[i][1]);
-            //     }
-            // }
+            // creates a section if it doesnt already exist (ex acit 1 a)
+            instructor = rootxml.getElementsByTagName('instructor')
+            var block;
+            if(!instructor[0]) {
+                block = xmldoc.createElement("instructor");
+                block.setAttribute("name",dataArr[i][8]);
+            }
+            for (n=0; n<instructor.length; n++) {
+                if(instructor[n].getAttribute('name') === dataArr[i][8]) {
+                    block = instructor[n];
+                    break;
+                } else {
+                    block = xmldoc.createElement("instructor");
+                    block.setAttribute("name",dataArr[i][8]);
+                }
+            }
 
-            instructor.appendChild(course);
-            rootxml.appendChild(instructor);
+            block.appendChild(course);
+            rootxml.appendChild(block);
 
         }
         fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-instructors' + '.xml',rootxml);
@@ -165,11 +168,11 @@ function createStudentHTML() {
         var courses = sections[i].getElementsByTagName('class')
         for(n=0; n<courses.length; n++) {
             var course = courses[n].getAttribute('course');
-            var day = courses[i].getElementsByTagName('day')
-            var start_time = courses[i].getElementsByTagName('start_time')
-            var end_time = courses[i].getElementsByTagName('end_time')
-            var instructor = courses[i].getElementsByTagName('instructor')
-            var bldg_room = courses[i].getElementsByTagName('bldg_room')
+            var day = courses[n].getElementsByTagName('day')
+            var start_time = courses[n].getElementsByTagName('start_time')
+            var end_time = courses[n].getElementsByTagName('end_time')
+            var instructor = courses[n].getElementsByTagName('instructor')
+            var bldg_room = courses[n].getElementsByTagName('bldg_room')
 
             HTMLcode += course + ' start: ' + start_time + ' end: ' + end_time + 
             ' instructor: ' + instructor + ' building room: ' + bldg_room + '<br>';
@@ -180,51 +183,32 @@ function createStudentHTML() {
 
 // creates the teachers html file.
 function createTeacherHTML(){
+    // loads the xml
     var data = fs.readFileSync('./data/' + fileDate + '-'+ blockInput + '-instructors' + '.xml')
     var parser = new xmldom.DOMParser();
     var xmldoc = parser.parseFromString(data.toString(), 'text/xml');
-    var root = xmldoc.documentElement;
+    var rootxml = xmldoc.documentElement;
 
-    var classesType ='<h1>'+ root.getAttribute("BLOCK") +'</h1>';
-    var x = root.childNodes;
-    var classDates = [];
+    var HTMLcode ='<h1>'+ rootxml.getAttribute("program") +'</h1>';
+    var instructors = rootxml.getElementsByTagName('instructor');
 
-    for(var i = 0;  i < x.length; i++){
-        // going through all of the class objects
-        if(x[i].childNodes != null) {
-            for (var z = 0; z < x[i].childNodes.length; z++) {
-                if (x[i].childNodes[z].nodeName == "INSTRUCTOR") {
-                    classDates.indexOf(x[i].childNodes[z].getAttribute("teacher")) === -1 ? classDates.push(x[i].childNodes[z].getAttribute("teacher")) : ""
-                }
-            }
-        }
+    for(i=0; i<instructors.length; i++) {
+        instructor = instructors[i].getAttribute('name');
+        HTMLcode += '<h2>' + instructor + '</h2>';
 
+        var courses = instructors[i].getElementsByTagName('class')
+        for(n=0; n<courses.length; n++) {
+            var course = courses[n].getAttribute('course');
+            var day = courses[n].getElementsByTagName('day')
+            var start_time = courses[n].getElementsByTagName('start_time')
+            var end_time = courses[n].getElementsByTagName('end_time')
+            var bldg_room = courses[n].getElementsByTagName('bldg_room')
 
-    }
-    for(var a = 0; a < classDates.length; a++) {
-        classesType+= '<h2>'+ classDates[a]+"</h2>";
-        classesType+='<ul>'
-        for (var z = 0; z < x.length; z++) {
-            if(x[z].childNodes != null) {
-                for (var f = 0; f < x[z].childNodes.length; f++) {
-                    // console.log(x[z].childNodes[f].nodeName);
-                    if (x[z].childNodes[f].nodeName == "INSTRUCTOR") {
-                        if(x[z].childNodes[f].getAttribute("teacher") == classDates[a]){
-
-                            var kidNodes = x[z].childNodes;
-                            classesType+=' <li>'
-                            for(var p = 0;  p < kidNodes.length;p++){
-                                classesType += kidNodes[p].nodeName + ": " + kidNodes[p].textContent+ ""
-                            }
-                            classesType+= "</li> ";
-                        }
-                    }
-                }
-                classesType+='</ul>';
-            }
+            HTMLcode += course + ' start: ' + start_time + ' end: ' + end_time + 
+            ' building room: ' + bldg_room + '<br>';
         }
     }
-    fs.writeFileSync('./data/' + fileDate + '-' + blockInput + "-instructors" +'.html',classesType);
+    fs.writeFileSync('./data/' + fileDate + '-' + blockInput + "-instructors" +'.html', HTMLcode);
 }
 
 // Reads a file and cleans it before returning it as an array.
@@ -302,6 +286,8 @@ function getTeacherData(rawData) {
 var fileName = '';
 var fileDate = '201830';
 var blockInput = '';
+
+// below is what runs the program
 
 // remove comments on the lines labeled "<--this" to have the program
 // ask for filename instead of being hardcoded.
