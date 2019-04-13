@@ -36,16 +36,28 @@ function checkFileExists(filename) {
     });
 }
 
-// creates the students xml file.
-async function createStudentXML(dataArr) {
+// creates the basic xml file.
+function createXML(group) {
     var xmlFile = fs.readFileSync('./data/test.xml')
     var parser = new xmldom.DOMParser();
-    var xmldoc = parser.parseFromString(xmlFile.toString(), 'text/xml');
+    var xmldoc = new xmldom.DOMParser().parseFromString(
+        '<?xml version="1.0" encoding="UTF-8"?>\n'+
+        '<?xml-stylesheet type="text/xsl" href="'+group+'_schedule.xsl"?>\n'+
+        '<Schedule\n'+
+            '\txmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n'+
+            '\txsi:noNamespaceSchemaLocation="'+group+'_schedule.xsd">\n'+
+        '</Schedule>\n'
+        ,'text/xml'
+    );
     xmldoc.getElementsByTagName('Schedule')[0].setAttribute('program', blockInput);
+    return xmldoc
+}
+
+// creates the students xml file.
+async function createStudentXML(dataArr) {
+
+    xmldoc = createXML("student")
     var rootxml = xmldoc.documentElement;
-    for(var z = 0; z < rootxml.childNodes.length; z++){
-        rootxml.removeChild(rootxml.childNodes[z].nodeName)
-    }
     for(var i = 0; i <dataArr.length; i++){
         // creates xml elements
         var course =  xmldoc.createElement("class")
@@ -91,21 +103,14 @@ async function createStudentXML(dataArr) {
 		rootxml.appendChild(block);
 	}
     validateXML('./data/' + fileDate + '-' + blockInput + '-students' + '.xml', './data/student_schedule.xsd')
-    fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-students' + '.xml',rootxml);
+    fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-students' + '.xml',xmldoc);
 }
 
 // creates the teachers xml file.
 function createTeacherXML(dataArr) {
     return new Promise (resolve => {
-        var xmlFile = fs.readFileSync('./data/test.xml')
-        var parser = new xmldom.DOMParser();
-        var xmldoc = parser.parseFromString(xmlFile.toString(), 'text/xml');
-        xmldoc.getElementsByTagName('Schedule')[0].setAttribute('program', blockInput);
+        xmldoc = createXML("instructor")
         var rootxml = xmldoc.documentElement;
-        for (var z = 0; z < rootxml.childNodes.length; z++) {
-            rootxml.removeChild(rootxml.childNodes[z].nodeName)
-        }
-
         for(var i = 0; i <dataArr.length; i++) {
             // creates xml elements
             var course =  xmldoc.createElement("class")
@@ -149,7 +154,7 @@ function createTeacherXML(dataArr) {
 
         }
         validateXML('./data/' + fileDate + '-' + blockInput + '-instructors' + '.xml', './data/instructor_schedule.xsd')
-        fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-instructors' + '.xml',rootxml);
+        fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-instructors' + '.xml',xmldoc);
         resolve();
     })
 }
