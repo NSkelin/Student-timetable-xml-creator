@@ -5,30 +5,31 @@
     <xs:element name="Schedule">  
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="CLASS" maxOccurs="unbounded"/>
+                <xs:element ref="section" maxOccurs="unbounded"/>
             </xs:sequence>
-            <xs:attribute name="BLOCK" type="xs:string"/>
+            <xs:attribute name="program" type="xs:string"/>
         </xs:complexType>   
     </xs:element>
 
-    <xs:element name='CLASS'>
+    <xs:element name="section">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name='CRN' type="xs:integer"/>
-                <xs:element name='COURSE' type="xs:string"/>
-                <xs:element name='TYPE' type="xs:string"/>
-                <xs:element name='DAY' type="xs:week"/>
-                <xs:element name='BEGIN_TIME' type="classStart"/>
-                <xs:element name='END_TIME' type="classEnd"/>
-                <xs:element name='INSTRUCTOR' type="xs:string"/>
-                <xs:element name='BLDG_ROOM' type="xs:string"/>
-                <xs:element name='START_DATE' type="xs:date"/>
-                <xs:element name='END_DATE' type="xs:date"/>
-                <xs:element name='MAX' type="xs:integer"/>
-                <xs:element name='ACT.' type="xs:integer"/>
-                <xs:element name='HRS' type="xs:decimal"/>
+                <xs:element ref="class" maxOccurs="unbounded"/>
             </xs:sequence>
-            <xs:attribute name="BLOCK" type="xs:string"/>
+            <xs:attribute name="block" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name='class'>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name='day' type="week"/>
+                <xs:element name='start_time' type="classStart"/>
+                <xs:element name='end_time' type="classEnd"/>
+                <xs:element name='instructor' type="xs:string"/>
+                <xs:element name='bldg_room' type="xs:string"/>
+            </xs:sequence>
+            <xs:attribute name="course" type="xs:string"/>
         </xs:complexType>
     </xs:element>
 
@@ -47,15 +48,13 @@
     <xs:simpleType name="classStart">
         <xs:restriction base="xs:integer">
             <xs:minInclusive value="830"/>
-            <xs:maxInclusive value="1330"/>
         </xs:restriction>
     </xs:simpleType>
 
     <!-- Simpletype to set the times class can end -->
     <xs:simpleType name="classEnd">
         <xs:restriction base="xs:integer">
-            <xs:minInclusive value="1130"/>
-            <xs:maxInclusive value="1630"/>
+            <xs:maxInclusive value="1720"/>
         </xs:restriction>
     </xs:simpleType>    
 
