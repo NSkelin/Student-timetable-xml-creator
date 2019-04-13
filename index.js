@@ -90,6 +90,7 @@ async function createStudentXML(dataArr) {
         block.appendChild(course);
 		rootxml.appendChild(block);
 	}
+    validateXML('./data/' + fileDate + '-' + blockInput + '-students' + '.xml', './data/student_schedule.xsd')
     fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-students' + '.xml',rootxml);
 }
 
@@ -147,10 +148,24 @@ function createTeacherXML(dataArr) {
             rootxml.appendChild(block);
 
         }
+        validateXML('./data/' + fileDate + '-' + blockInput + '-students' + '.xml', './data/instructor_schedule.xsd')
         fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-instructors' + '.xml',rootxml);
         resolve();
     })
 }
+
+// validates the entered xml file with the entered schema
+function validateXML(XMLFile, schemaLocation) {
+    XMLDoc = fs.readFileSync(XMLFile);
+    var validator = require('xsd-schema-validator');
+    validator.validateXML(XMLDoc, schemaLocation, function (err, result) {
+        if (err) {
+            console.log(result);
+        }
+        result.valid
+    });
+}
+
 
 // creates the students html file.
 function createStudentHTML() {
