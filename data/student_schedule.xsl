@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" 
-	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
 
 	<!-- root template -->
@@ -20,9 +19,9 @@
 		<h2>
 			Student Timetables:
 			<xsl:value-of select="@block"/>
-			( hours)
+			(<xsl:value-of select="hours"/> hours)
 		</h2>
-		<table class="help" border="1">
+		<table border="1">
 			<!-- creates the tables time row -->
 			<tr>
 		        <th></th><th>0830</th><th>0930</th><th>1030</th><th>1130</th>
@@ -67,47 +66,47 @@
 		<xsl:param name="day"/>
 
 		<!-- uses the class template and sends in parameters that determine the column and row -->
-      	<th><xsl:apply-templates>
+      	<th><xsl:apply-templates select="class">
       		<xsl:with-param name="start">830</xsl:with-param> 							<!-- determines column -->
       		<xsl:with-param name="end">929</xsl:with-param> 							<!-- determines column -->
       		<xsl:with-param name="day"><xsl:value-of select="$day"/></xsl:with-param> 	<!-- determines row -->
       	</xsl:apply-templates></th>
-      	<th><xsl:apply-templates>
+      	<th><xsl:apply-templates select="class">
       		<xsl:with-param name="start">930</xsl:with-param>
       		<xsl:with-param name="end">1029</xsl:with-param>
       		<xsl:with-param name="day"><xsl:value-of select="$day"/></xsl:with-param>
       	</xsl:apply-templates></th>
-      	<th><xsl:apply-templates>
+      	<th><xsl:apply-templates select="class">
       		<xsl:with-param name="start">1030</xsl:with-param>
       		<xsl:with-param name="end">1129</xsl:with-param>
       		<xsl:with-param name="day"><xsl:value-of select="$day"/></xsl:with-param>
       	</xsl:apply-templates></th>
-      	<th><xsl:apply-templates>
+      	<th><xsl:apply-templates select="class">
       		<xsl:with-param name="start">1130</xsl:with-param>
       		<xsl:with-param name="end">1229</xsl:with-param>
       		<xsl:with-param name="day"><xsl:value-of select="$day"/></xsl:with-param>
       	</xsl:apply-templates></th>
-      	<th><xsl:apply-templates>
+      	<th><xsl:apply-templates select="class">
       		<xsl:with-param name="start">1230</xsl:with-param>
       		<xsl:with-param name="end">1329</xsl:with-param>
       		<xsl:with-param name="day"><xsl:value-of select="$day"/></xsl:with-param>
       	</xsl:apply-templates></th>
-      	<th><xsl:apply-templates>
+      	<th><xsl:apply-templates select="class">
       		<xsl:with-param name="start">1330</xsl:with-param>
       		<xsl:with-param name="end">1429</xsl:with-param>
       		<xsl:with-param name="day"><xsl:value-of select="$day"/></xsl:with-param>
       	</xsl:apply-templates></th>
-      	<th><xsl:apply-templates>
+      	<th><xsl:apply-templates select="class">
       		<xsl:with-param name="start">1430</xsl:with-param>
       		<xsl:with-param name="end">1529</xsl:with-param>
       		<xsl:with-param name="day"><xsl:value-of select="$day"/></xsl:with-param>
       	</xsl:apply-templates></th>
-      	<th><xsl:apply-templates>
+      	<th><xsl:apply-templates select="class">
       		<xsl:with-param name="start">1530</xsl:with-param>
       		<xsl:with-param name="end">1629</xsl:with-param>
       		<xsl:with-param name="day"><xsl:value-of select="$day"/></xsl:with-param>
       	</xsl:apply-templates></th>
-      	<th><xsl:apply-templates>
+      	<th><xsl:apply-templates select="class">
       		<xsl:with-param name="start">1630</xsl:with-param>
       		<xsl:with-param name="end">1729</xsl:with-param>
       		<xsl:with-param name="day"><xsl:value-of select="$day"/></xsl:with-param>
@@ -121,10 +120,10 @@
 		<xsl:param name="day"/>
 
   		<xsl:if test="day=$day and (end_time >= $start and $end >= start_time)">
-  			<xsl:value-of select="@course"/><br/>
+  			<br/><xsl:value-of select="@course"/><br/>
   			<xsl:value-of select="instructor"/><br/>
   			<xsl:value-of select="bldg_room"/><br/>
-  			#<xsl:value-of select="@crn"/>
+  			#<xsl:value-of select="@crn"/><br/>
   		</xsl:if>
 	</xsl:template>
 </xsl:stylesheet>
