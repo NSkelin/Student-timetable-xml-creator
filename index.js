@@ -4,7 +4,7 @@ var xmldom = require('xmldom');
 var csv = require('csv-parse');
 var opn = require('opn');
 
-var fileName = '201830-Subject_Course Timetables - ttbl0010.csv';
+var fileName = './data/201830-Subject_Course Timetables - ttbl0010.csv';
 var fileDate = '201830';
 var blockInput = '';
 
@@ -38,7 +38,6 @@ function checkFileExists(filename) {
 
 // creates the basic xml file.
 function createXML(group) {
-    var xmlFile = fs.readFileSync('./data/test.xml')
     var parser = new xmldom.DOMParser();
     var xmldoc = new xmldom.DOMParser().parseFromString(
         '<?xml version="1.0" encoding="UTF-8"?>\n'+
@@ -69,6 +68,7 @@ async function createStudentXML(dataArr) {
 
         // populates xml elements
         course.setAttribute('course',dataArr[i][3]);
+        course.setAttribute('crn',dataArr[i][2]);
         day.textContent = dataArr[i][5];
         beginTime.textContent = dataArr[i][6];
         endTime.textContent = dataArr[i][7];
@@ -170,7 +170,6 @@ function validateXML(XMLFile, schemaLocation) {
         result.valid
     });
 }
-
 
 // creates the students html file.
 function createStudentHTML() {
