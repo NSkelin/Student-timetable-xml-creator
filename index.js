@@ -120,9 +120,8 @@ async function createStudentXML(dataArr) {
         time.textContent = hours
         section[i].appendChild(time);
     }
-
-    validateXML('./data/' + fileDate + '-' + blockInput + '-students' + '.xml', './data/student_schedule.xsd')
     fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-students' + '.xml',xmldoc);
+    validateXML('./data/' + fileDate + '-' + blockInput + '-students' + '.xml', './data/student_schedule.xsd')
 }
 
 // creates the teachers xml file.
@@ -195,8 +194,8 @@ function createTeacherXML(dataArr) {
             instructors[i].appendChild(time);
         }
 
-        validateXML('./data/' + fileDate + '-' + blockInput + '-instructors' + '.xml', './data/instructor_schedule.xsd')
         fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-instructors' + '.xml',xmldoc);
+        validateXML('./data/' + fileDate + '-' + blockInput + '-instructors' + '.xml', './data/instructor_schedule.xsd')
         resolve();
     })
 }
