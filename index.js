@@ -102,6 +102,25 @@ async function createStudentXML(dataArr) {
         block.appendChild(course);
 		rootxml.appendChild(block);
 	}
+    // finds the estimated amount of hours 
+    var section = rootxml.getElementsByTagName('section');
+    for(i=0; i<section.length; i++) {
+        var hours = 0;
+        var courses = section[i].getElementsByTagName('class')
+        for(n=0; n<courses.length; n++) {
+            var start_time = courses[n].getElementsByTagName('start_time')
+            var end_time = courses[n].getElementsByTagName('end_time')
+            start_time = parseInt(start_time[0].childNodes[0].nodeValue);
+            end_time = parseInt(end_time[0].childNodes[0].nodeValue);
+            var hour = end_time - start_time
+            hours = hours + hour
+        }
+        var hours = Math.round(hours/100);
+        time = xmldoc.createElement("hours");
+        time.textContent = hours
+        section[i].appendChild(time);
+    }
+
     validateXML('./data/' + fileDate + '-' + blockInput + '-students' + '.xml', './data/student_schedule.xsd')
     fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-students' + '.xml',xmldoc);
 }
@@ -118,19 +137,23 @@ function createTeacherXML(dataArr) {
             var beginTime = xmldoc.createElement("start_time");
             var endTime = xmldoc.createElement("end_time");
             var bldRoom = xmldoc.createElement("bldg_room");
+            var set = xmldoc.createElement("set");
 
             // populates xml elements
             course.setAttribute('course',dataArr[i][3]);
+            course.setAttribute('crn',dataArr[i][2]);
             day.textContent = dataArr[i][5];
             beginTime.textContent = dataArr[i][6];
             endTime.textContent = dataArr[i][7];
             bldRoom.textContent = dataArr[i][9];
+            set.textContent = dataArr[i][1];
 
             // adds xml elements under course
             course.appendChild(day);
             course.appendChild(beginTime);
             course.appendChild(endTime);
             course.appendChild(bldRoom);
+            course.appendChild(set);
 
             // creates a section if it doesnt already exist (ex acit 1 a)
             instructor = rootxml.getElementsByTagName('instructor')
@@ -148,11 +171,30 @@ function createTeacherXML(dataArr) {
                     block.setAttribute("name",dataArr[i][8]);
                 }
             }
-
             block.appendChild(course);
             rootxml.appendChild(block);
 
         }
+
+        // finds the estimated amount of hours 
+        var instructors = rootxml.getElementsByTagName('instructor');
+        for(i=0; i<instructors.length; i++) {
+            var hours = 0;
+            var courses = instructors[i].getElementsByTagName('class')
+            for(n=0; n<courses.length; n++) {
+                var start_time = courses[n].getElementsByTagName('start_time')
+                var end_time = courses[n].getElementsByTagName('end_time')
+                start_time = parseInt(start_time[0].childNodes[0].nodeValue);
+                end_time = parseInt(end_time[0].childNodes[0].nodeValue);
+                var hour = end_time - start_time
+                hours = hours + hour
+            }
+            var hours = Math.round(hours/100);
+            time = xmldoc.createElement("hours");
+            time.textContent = hours
+            instructors[i].appendChild(time);
+        }
+
         validateXML('./data/' + fileDate + '-' + blockInput + '-instructors' + '.xml', './data/instructor_schedule.xsd')
         fs.writeFileSync('./data/' + fileDate + '-' + blockInput + '-instructors' + '.xml',xmldoc);
         resolve();
