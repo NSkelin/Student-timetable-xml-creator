@@ -1,0 +1,1 @@
+To run the program from cmd type "node index.js <name>" where name is the course (ex ACIT).
