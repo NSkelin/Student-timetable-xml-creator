@@ -15,6 +15,7 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="class" maxOccurs="unbounded"/>
+                <xs:element name='hours' type="xs:string"/>
             </xs:sequence>
             <xs:attribute name="name" type="xs:string"/>
         </xs:complexType>
@@ -27,8 +28,10 @@
                 <xs:element name='start_time' type="classStart"/>
                 <xs:element name='end_time' type="classEnd"/>
                 <xs:element name='bldg_room' type="xs:string"/>
+                <xs:element name='set' type="xs:string"/>
             </xs:sequence>
             <xs:attribute name="course" type="xs:string"/>
+            <xs:attribute name="crn" type="xs:string"/>
         </xs:complexType>
     </xs:element>
 
